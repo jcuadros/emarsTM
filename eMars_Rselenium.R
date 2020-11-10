@@ -3,6 +3,7 @@ library(RSelenium)
 library(xml2)
 library(jsonlite)
 library(tidyverse)
+library(rvest)
 
 eMarsdf <- data.frame("ID" = vector(length=1082), "URL" = vector(length=1082), "Title" = vector(length=1082))
 webp <- vector(length=217)
@@ -34,3 +35,9 @@ for (i in 1:1082) {
   eMarsdf[i,"URL"] <- paste("https://emars.jrc.ec.europa.eu/api/JsonAccident/",eMarsdf[i,"ID"], sep="")
 }
 
+remDr$open()
+remDr$navigate(eMarsdf[1,"URL"])
+jsonprova <- fromJSON("https://emars.jrc.ec.europa.eu/api/JsonAccident/6923d7d1-c794-9738-05f2-05e41223dd72")
+
+codejson
+jsonprova
