@@ -32,12 +32,29 @@ eMarsdf[1082,"ID"] <- "aa4023ef-1ccf-3a28-ec6d-fb2fed44ed02"
 
 
 for (i in 1:1082) {
-  eMarsdf[i,"URL"] <- paste("https://emars.jrc.ec.europa.eu/api/JsonAccident/",eMarsdf[i,"ID"], sep="")
+  eMarsdf[i,"URL"] <- paste("view-source:https://emars.jrc.ec.europa.eu/api/JsonAccident/",eMarsdf[i,"ID"], sep="")
 }
 
-remDr$open()
-remDr$navigate(eMarsdf[1,"URL"])
-jsonprova <- fromJSON("https://emars.jrc.ec.europa.eu/api/JsonAccident/6923d7d1-c794-9738-05f2-05e41223dd72")
 
-codejson
-jsonprova
+
+rD <- rsDriver(browser="firefox", port=4546L, verbose=F)
+remDr <- rD[["client"]]
+remDr$open(silent=T)
+
+
+for (i in 1:1082) {
+  remDr$navigate(eMarsdf[i,"URL"])
+  html <- remDr$getPageSource()
+  xmlscript <- as.character(xml_find_first(read_html(html[[1]]),"//../pre/text()"))
+  reportwebJSON <- fromJSON(xmlscript)
+  write_json(reportwebJSON, paste(eMarsdf[i,"ID"],".json", sep = ""))
+}
+
+for (i in 1:1082) {
+  eMarsdf[i,"Route"] <- paste("C:/Users/polja/Desktop/IQS/MEQ/TFM/emarsTM/JSON/",paste(eMarsdf[i,"ID"],".json",sep = ""),sep = "")
+}
+
+for (i in 1:1082) {
+  reportJSON <- fromJSON(eMarsdf[i,"Route"])
+  eMarsdf[i,"Title"]<- reportJSON$Data$AccidentVersion$Translation$Title
+}
